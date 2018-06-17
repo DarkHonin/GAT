@@ -62,6 +62,8 @@ int     read_stream(t_stream *stream)
 void    *stream_next(t_stream *e)
 {
     void *ret;
+
+    ret = NULL;
     if(ft_buffget(e->item_size, e->buffer, ret) <= 0)
     {
         if(read_stream(e) <= 0)

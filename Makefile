@@ -1,22 +1,20 @@
-LIBFT_DIR:=libft
-LIBFT_GIT:=https://github.com/DarkHonin/LIBFT.git
-TEST_DIR:=test
-
+LIBFT:="${CURDIR}/libft"
+LIBTEST:="${CURDIR}/testing"
+FLAGS:=-L$(LIBFT) -L$(LIBTEST) -lft -ltest -I$(LIBFT) -I$(LIBTEST) -I"${CURDIR}" 
+TEST_DIR=tests
 make:
-	make -C $(LIBFT_DIR)
-	gcc data_stream.c -L $(LIBFT_DIR) -lft -I $(LIBFT_DIR) -I .
+	make -C $(LIBFT)
+	make -C $(LIBTEST)
+	gcc data_stream.c $(FLAGS)
 
-test: $(TEST)
-	
+re:
+	make -C $(LIBFT) re
+	make -C $(LIBTEST) re
 
 $(TEST_DIR):
-	if [ ! -d "$(TEST_DIR)" ]; then	mkdir $(TEST_DIR); fi
+	if [ ! -d $(TEST_DIR) ]; then mkdir $(TEST_DIR); fi
 
-$(TEST):
-	gcc -o $(TEST_DIR)/$*.exe  *.c gat.h ".test/$(TEST)" -L $(LIBFT_DIR) -lft -I $(LIBFT_DIR) -I . 
+test: $(TEST_DIR)
+	make -C $(LIBTEST) test SRC="'${CURDIR}/$(SRC)' '${CURDIR}/data_stream.c'"\
+		XFLAGS='$(FLAGS)' OUT='"${CURDIR}/$(TEST_DIR)"'
 
-setup:
-	if [ ! -d "libft/.git" ]; then git clone $(LIBFT_GIT) $(LIBFT_DIR); \
-	else \
-	cd $(LIBFT_DIR) && pwd && git pull; \
-	fi;

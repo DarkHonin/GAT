@@ -4,6 +4,7 @@
 # define S_STD_IN "STDIN"
 # define S_STD_OUT "STDOUT"
 #include <libft.h>
+#include <libtest.h>
 #include <fcntl.h>
 
 typedef enum e_s_type{
@@ -19,9 +20,10 @@ typedef struct s_stream
 	t_stream_type	type;
 } t_stream;
 
-t_stream *open_stream(size_t data_size, char *src);
-int     read_stream(t_stream *stream);
-int close_stream(t_stream *stream);
+t_stream	*open_stream(size_t data_size, char *src);
+int     	read_stream(t_stream *stream);
+int			close_stream(t_stream *stream);
+void    *stream_next(t_stream *e);
 
 #endif
 
