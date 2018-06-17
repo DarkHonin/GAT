@@ -7,8 +7,11 @@ make:
 	make -C $(LIBTEST)
 	gcc data_stream.c $(FLAGS)
 
-re:
+re: re_libft re_libtest
+
+re_libft:
 	make -C $(LIBFT) re
+re_libtest:
 	make -C $(LIBTEST) re
 
 $(TEST_DIR):

@@ -1,5 +1,5 @@
 #include "gat.h"
-
+# include <stdio.h>
 /*
 **  Open_stream creates a stream object and should
 **  make all preperations for reading from or to
@@ -24,15 +24,10 @@ t_stream *open_stream(size_t data_size, char *src)
     else
     {
         fd = open(src, _O_RDWR);
-        ret->type = FILE;
+        ret->type = FILE_S;
     }
     ret->buffer = ft_buffnew(S_BUFF_SIZE, fd);
     ret->item_size = data_size;
-   // if (read_stream(ret) == -1)
-  //  {
-  //      close_stream(ret);
-  //      return (NULL);
-  //  }
     return (ret);
 }
 
@@ -43,13 +38,16 @@ int     read_stream(t_stream *stream)
 
     status = ft_buffstat(stream->buffer);
     if (status < S_BUFF_SIZE && status > 0)
+    {
         rd_start = ft_buffshift(stream->buffer);
+    }
     else if (status <= 0)
     {
         ft_buffreset(stream->buffer);
         rd_start = stream->buffer->pointer;
     }
-    return (read(stream->buffer->meta, rd_start, S_BUFF_SIZE - (stream->buffer->data - rd_start)));
+    return (stream->in_buffer += read(stream->buffer->meta,
+        rd_start, S_BUFF_SIZE - (stream->buffer->data - rd_start)));
 }
 
 
@@ -62,15 +60,26 @@ int     read_stream(t_stream *stream)
 void    *stream_next(t_stream *e)
 {
     void *ret;
+    int avail;
 
-    ret = NULL;
-    if(ft_buffget(e->item_size, e->buffer, ret) <= 0)
+    ret = ft_memalloc(e->item_size);
+    avail = ft_buffget(e->item_size, e->buffer, ret);
+    if(avail <= 0 || e->in_buffer == 0)
     {
-        if(read_stream(e) <= 0)
+        avail = read_stream(e);
+        if(avail <= 0)
+        {
+            free(ret);
             return (NULL);
-        else if (ft_buffget(e->item_size, e->buffer, ret) <= 0)
+        }
+        if (ft_buffget(e->item_size, e->buffer, ret) <= 0)
+        {
+            free(ret);
             return (NULL);
+        }
     }
+    e->in_buffer -= e->item_size;
+    printf("In buffer: %i\n", e->in_buffer);
     return (ret);
 }
 
@@ -84,9 +93,11 @@ void    *stream_next(t_stream *e)
 ** Returns -1 if there was an error
 */
 
-int close_stream(t_stream *stream)
+int close_stream(t_stream **stream)
 {
-    close(stream->buffer->meta);
-
-    return (-1);
+    close((*stream)->buffer->meta);
+    free((*stream)->buffer);
+    free((*stream));
+    *stream = NULL;
+    return (1);
 }

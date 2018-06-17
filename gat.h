@@ -8,21 +8,22 @@
 #include <fcntl.h>
 
 typedef enum e_s_type{
-	STD_INPUT,
-	STD_OUT,
-	FILE
+	STD_INPUT_S,
+	STD_OUT_S,
+	FILE_S
 } t_stream_type;
 
 typedef struct s_stream
 {
 	t_buff			*buffer;
 	size_t			item_size;
+	size_t			in_buffer;
 	t_stream_type	type;
 } t_stream;
 
 t_stream	*open_stream(size_t data_size, char *src);
 int     	read_stream(t_stream *stream);
-int			close_stream(t_stream *stream);
+int			close_stream(t_stream **stream);
 void    *stream_next(t_stream *e);
 
 #endif
